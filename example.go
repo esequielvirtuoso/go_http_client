@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/esequielvirtuoso/go_http_client/gohttp"
 )
@@ -12,14 +12,18 @@ var (
 	gitHubHttpClient = getGitHubClient()
 )
 
-func getGitHubClient() gohttp.HttpClient {
-	client := gohttp.New()
-	commonHeaders := make(http.Header)
-	commonHeaders.Set("Authorization", "Bearer ABC-123")
+func getGitHubClient() gohttp.Client {
+	builder := gohttp.NewBuilder()
+	builder.SetConnectionTimeout(2 * time.Second)
+	builder.SetRequestTimeout(50 * time.Millisecond)
+	// builder.DisableTimeouts(true)
 
-	client.SetHeaders(commonHeaders)
+	// commonHeaders := make(http.Header)
+	// commonHeaders.Set("Authorization", "Bearer ABC-123")
 
-	return client
+	// builder.SetHeaders(commonHeaders)
+
+	return builder.Build()
 }
 
 func main() {
@@ -29,20 +33,20 @@ func main() {
 
 func getRequest() {
 	headers := make(http.Header)
-	headers.Set("Authorization", "Bearer ABC-123")
+	// headers.Set("Authorization", "Bearer ABC-123")
 
 	response, err := gitHubHttpClient.Get("https://api.github.com", headers)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(response.StatusCode)
-
-	bytes, err := ioutil.ReadAll(response.Body)
-	if err != nil {
+	// Using custom response
+	var user User
+	if err := response.UnmarshalJson(&user); err != nil {
 		panic(err)
 	}
-	fmt.Println(string(bytes))
+	fmt.Print(user.FirstName)
+
 }
 
 type User struct {
@@ -56,11 +60,7 @@ func createUser(user User) {
 		panic(err)
 	}
 
-	fmt.Println(response.StatusCode)
+	fmt.Println(response.StatusCode())
 
-	bytes, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(string(bytes))
+	fmt.Println(string(response.Bytes()))
 }
