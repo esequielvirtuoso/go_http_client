@@ -9,17 +9,18 @@ import (
 
 func TestGetRequestHeaders(t *testing.T) {
 	// Initialization
-	client := httpClient{}
 	commonHeaders := make(http.Header)
 	commonHeaders.Set("Content-Type", "application/json")
 	commonHeaders.Set("User-Agent", "cool-http-client")
-	client.Headers = commonHeaders
+
+	builder := clientBuilder{headers: commonHeaders}
+	client := httpClient{builder: &builder}
 
 	// Execution
 	requestHeaders := make(http.Header)
 	requestHeaders.Set("X-Request-Id", "ABC-123")
 
-	fullHeaders := client.getRequestReaders(requestHeaders)
+	fullHeaders := client.getRequestHeaders(requestHeaders)
 	// Validation
 	assert.EqualValues(t, 3, len(fullHeaders))
 	assert.EqualValues(t, "ABC-123", fullHeaders.Get("X-Request-Id"))

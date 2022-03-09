@@ -34,10 +34,14 @@ func (c *httpClient) getRequestBody(contentType string, body interface{}) ([]byt
 }
 
 func (c *httpClient) do(method string, url string, headers http.Header, body interface{}) (*Response, error) {
-	fullHeaders := c.getRequestReaders(headers)
+	fullHeaders := c.getRequestHeaders(headers)
 	requestBody, err := c.getRequestBody(fullHeaders.Get("Content-Type"), body)
 	if err != nil {
 		return nil, err
+	}
+
+	if mock := mockupServer.getMock(method, url, string(requestBody)); mock != nil {
+		return mock.GetResponse()
 	}
 
 	request, err := http.NewRequest(method, url, bytes.NewBuffer(requestBody))
@@ -115,7 +119,7 @@ func (c *httpClient) getConnectionTimeout() time.Duration {
 	return defaultConnectionTimeout
 }
 
-func (c *httpClient) getRequestReaders(requestHeaders http.Header) http.Header {
+func (c *httpClient) getRequestHeaders(requestHeaders http.Header) http.Header {
 	result := make(http.Header)
 
 	// Add common headers to the request
