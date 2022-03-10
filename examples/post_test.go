@@ -6,15 +6,15 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/esequielvirtuoso/go_http_client/gohttp"
+	gohttpmock "github.com/esequielvirtuoso/go_http_client/gohttp_mock"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateRepo(t *testing.T) {
 	t.Run("TestTimeoutFromGithub", func(t *testing.T) {
 		// Initialization
-		gohttp.FlushMocks()
-		gohttp.AddMock(gohttp.Mock{
+		gohttpmock.DeleteMocks()
+		gohttpmock.AddMock(gohttpmock.Mock{
 			Method:      http.MethodPost,
 			Url:         "https://api.github.com/user/repos",
 			RequestBody: `{"name":"test-repo","description":"Test repository.","private":true}`,
@@ -38,8 +38,8 @@ func TestCreateRepo(t *testing.T) {
 
 	t.Run("TestNoError", func(t *testing.T) {
 		// Initialization
-		gohttp.FlushMocks()
-		gohttp.AddMock(gohttp.Mock{
+		gohttpmock.DeleteMocks()
+		gohttpmock.AddMock(gohttpmock.Mock{
 			Method:             http.MethodPost,
 			Url:                "https://api.github.com/user/repos",
 			RequestBody:        `{"name":"test-repo","description":"Test repository.","private":true}`,
@@ -66,8 +66,8 @@ func TestCreateRepo(t *testing.T) {
 
 	t.Run("TestErrorParsingGithubError", func(t *testing.T) {
 		// Initialization
-		gohttp.FlushMocks()
-		gohttp.AddMock(gohttp.Mock{
+		gohttpmock.DeleteMocks()
+		gohttpmock.AddMock(gohttpmock.Mock{
 			Method:             http.MethodPost,
 			Url:                "https://api.github.com/user/repos",
 			RequestBody:        `{"name":"test-repo","description":"Test repository.","private":true}`,
@@ -91,8 +91,8 @@ func TestCreateRepo(t *testing.T) {
 
 	t.Run("TestErrorUnmarshalResponse", func(t *testing.T) {
 		// Initialization
-		gohttp.FlushMocks()
-		gohttp.AddMock(gohttp.Mock{
+		gohttpmock.DeleteMocks()
+		gohttpmock.AddMock(gohttpmock.Mock{
 			Method:             http.MethodPost,
 			Url:                "https://api.github.com/user/repos",
 			RequestBody:        `{"name":"test-repo","description":"Test repository.","private":true}`,
