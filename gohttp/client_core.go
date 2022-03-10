@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/esequielvirtuoso/go_http_client/core"
+	gohttpmock "github.com/esequielvirtuoso/go_http_client/gohttp_mock"
 	"github.com/esequielvirtuoso/go_http_client/gomime"
 )
 
@@ -35,14 +37,14 @@ func (c *httpClient) getRequestBody(contentType string, body interface{}) ([]byt
 	}
 }
 
-func (c *httpClient) do(method string, url string, headers http.Header, body interface{}) (*Response, error) {
+func (c *httpClient) do(method string, url string, headers http.Header, body interface{}) (*core.Response, error) {
 	fullHeaders := c.getRequestHeaders(headers)
 	requestBody, err := c.getRequestBody(fullHeaders.Get(gomime.HeaderContentType), body)
 	if err != nil {
 		return nil, err
 	}
 
-	if mock := mockupServer.getMock(method, url, string(requestBody)); mock != nil {
+	if mock := gohttpmock.GetMock(method, url, string(requestBody)); mock != nil {
 		return mock.GetResponse()
 	}
 
@@ -66,11 +68,11 @@ func (c *httpClient) do(method string, url string, headers http.Header, body int
 		return nil, err
 	}
 
-	formatedResponse := Response{
-		status:     response.Status,
-		statusCode: response.StatusCode,
-		headers:    response.Header,
-		body:       responseBody,
+	formatedResponse := core.Response{
+		Status:     response.Status,
+		StatusCode: response.StatusCode,
+		Headers:    response.Header,
+		Body:       responseBody,
 	}
 	return &formatedResponse, nil
 }
